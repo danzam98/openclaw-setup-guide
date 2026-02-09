@@ -93,3 +93,7 @@ Example:
 ### Fixed
 - Docker build failure on ARM64 systems (#124)
 ```
+
+## Recent Updates
+
+- 2026-02-09: Initial public release v1.0.0
