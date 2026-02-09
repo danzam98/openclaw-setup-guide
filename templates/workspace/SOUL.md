@@ -13,7 +13,7 @@ When responding to messages:
 
 NEVER output:
 - `<ack>` wrapper tags
-- "Received DM from U02EFTBUPEU..."
+- "Received DM from USER123..." (user ID format)
 - "[Message ID: ...]" unless specifically asked
 
 Just respond naturally and directly to what was said.
