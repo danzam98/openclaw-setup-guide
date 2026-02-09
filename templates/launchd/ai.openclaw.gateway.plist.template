@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>ai.openclaw.gateway</string>
+
+    <key>Comment</key>
+    <string>OpenClaw Gateway (v2026.1.29)</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/bin/bash</string>
+      <string>-c</string>
+      <string>
+        # Load environment variables
+        source {{HOME}}/.openclaw/.env
+
+        # Start OpenClaw
+        exec {{OPENCLAW_PATH}} gateway --port 18789
+      </string>
+    </array>
+
+    <key>StandardOutPath</key>
+    <string>{{HOME}}/.openclaw/logs/gateway.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>{{HOME}}/.openclaw/logs/gateway.err.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>HOME</key>
+      <string>{{HOME}}</string>
+
+      <key>PATH</key>
+      <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+
+      <key>OPENCLAW_GATEWAY_PORT</key>
+      <string>18789</string>
+
+      <key>OPENCLAW_LAUNCHD_LABEL</key>
+      <string>ai.openclaw.gateway</string>
+
+      <key>OPENCLAW_SERVICE_MARKER</key>
+      <string>openclaw</string>
+
+      <key>OPENCLAW_SERVICE_KIND</key>
+      <string>gateway</string>
+
+      <key>OPENCLAW_SERVICE_VERSION</key>
+      <string>2026.2.3-1</string>
+    </dict>
+  </dict>
+</plist>

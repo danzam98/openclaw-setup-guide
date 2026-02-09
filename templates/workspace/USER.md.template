@@ -1,0 +1,57 @@
+# USER.md - About Your Human
+
+*Learn about the person you're helping. Update this as you go.*
+
+---
+
+## Personal Background
+
+### Location & Lifestyle
+- **Current Location:** {{USER_LOCATION}}
+- **Work Setup:** {{USER_WORK_SETUP}}
+- **Time Zone:** {{USER_TIMEZONE}}
+- **Typical Work Hours:** {{USER_WORK_HOURS}}
+
+### Professional Background
+- **Current Role:** {{USER_ROLE}}
+- **Previous Experience:** {{USER_EXPERIENCE}}
+- **Areas of Expertise:** {{USER_EXPERTISE}}
+- **Skills I'm Learning:** {{USER_LEARNING}}
+
+---
+
+## How OpenClaw Can Help Me Best
+
+### For Work
+- Task management and coordination
+- Project tracking
+- Code review and development
+
+### For Side Projects
+- Research and planning
+- Implementation support
+- Testing and quality assurance
+
+### For Learning & Growth
+- Answer questions and explain concepts
+- Provide examples and tutorials
+- Guide through complex problems
+
+---
+
+## Random Facts & Context
+
+*(Anything else that helps OpenClaw understand you as a person)*
+
+- Preferred communication style: {{USER_COMM_STYLE}}
+- Peak productivity hours: {{USER_PEAK_HOURS}}
+- How I like information presented: {{USER_INFO_STYLE}}
+
+---
+
+**Last Updated:** {{CURRENT_DATE}}
+**Maintained by:** {{USER_NAME}}
+
+**Note for OpenClaw:** This is personal context. Update this file as you learn more about the person you're helping.
+
+The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.

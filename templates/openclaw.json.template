@@ -1,0 +1,326 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.1.29",
+    "lastTouchedAt": "2026-02-04T07:12:05.409Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-02-03T18:32:10.014Z",
+    "lastRunVersion": "2026.1.29",
+    "lastRunCommand": "doctor",
+    "lastRunMode": "local"
+  },
+  "skills": {
+    "load": {
+      "extraDirs": ["~/.openclaw/workspace/skills"]
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "vertexai-proxy": {
+        "baseUrl": "http://127.0.0.1:8000/v1",
+        "apiKey": "proxy-handles-auth",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "google/gemini-2.5-flash-low",
+            "name": "Gemini 2.5 Flash (Low Thinking)",
+            "reasoning": true,
+            "input": ["text"],
+            "cost": {
+              "input": 1e-07,
+              "output": 4e-07,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1048576,
+            "maxTokens": 65536
+          },
+          {
+            "id": "google/gemini-2.5-flash-medium",
+            "name": "Gemini 2.5 Flash (Medium Thinking)",
+            "reasoning": true,
+            "input": ["text"],
+            "cost": {
+              "input": 1e-07,
+              "output": 4e-07,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1048576,
+            "maxTokens": 65536
+          },
+          {
+            "id": "google/gemini-2.5-flash-high",
+            "name": "Gemini 2.5 Flash (High Thinking)",
+            "reasoning": true,
+            "input": ["text"],
+            "cost": {
+              "input": 1e-07,
+              "output": 4e-07,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1048576,
+            "maxTokens": 65536
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "vertexai-proxy/google/gemini-2.5-flash-medium"
+      },
+      "memorySearch": {
+        "enabled": true,
+        "provider": "gemini",
+        "remote": {
+          "apiKey": "${GEMINI_API_KEY}"
+        },
+        "model": "text-embedding-004"
+      },
+      "heartbeat": {
+        "model": "vertexai-proxy/google/gemini-2.5-flash-low"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8,
+        "model": "vertexai-proxy/google/gemini-2.5-flash-high"
+      },
+      "sandbox": {
+        "mode": "non-main",
+        "scope": "agent",
+        "workspaceAccess": "rw",
+        "workspaceRoot": "~/.openclaw/sandboxes",
+        "docker": {
+          "image": "openclaw-sandbox:bookworm-dev",
+          "network": "bridge",
+          "readOnlyRoot": true,
+          "env": {
+            "GEMINI_API_KEY": "${GEMINI_API_KEY}"
+          },
+          "tmpfs": ["/tmp", "/var/tmp", "/run"],
+          "user": "{{DOCKER_USER_ID}}:{{DOCKER_GROUP_ID}}",
+          "capDrop": ["ALL"],
+          "pidsLimit": 256,
+          "memory": "2g",
+          "memorySwap": "4g",
+          "cpus": 2
+        },
+        "prune": {
+          "idleHours": 24,
+          "maxAgeDays": 7
+        }
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "name": "Main Orchestrator",
+        "model": "vertexai-proxy/google/gemini-2.5-flash-medium",
+        "tools": {
+          "allow": [
+            "sessions_send",
+            "sessions_spawn",
+            "sessions_list",
+            "sessions_history",
+            "session_status"
+          ]
+        },
+        "subagents": {
+          "allowAgents": [
+            "planner",
+            "developer",
+            "researcher",
+            "qa-reviewer",
+            "image-generator",
+            "devops"
+          ]
+        },
+        "workspace": "~/.openclaw/workspace",
+        "default": true,
+        "sandbox": {
+          "mode": "all",
+          "scope": "shared",
+          "workspaceAccess": "rw",
+          "sessionToolsVisibility": "all"
+        }
+      },
+      {
+        "id": "planner",
+        "name": "Planner Agent",
+        "model": "vertexai-proxy/google/gemini-2.5-flash-high",
+        "tools": {
+          "allow": ["coding-agent", "gemini-grounded-research", "exec", "read", "write"]
+        },
+        "workspace": "~/.openclaw/workspace-planner",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "rw"
+        }
+      },
+      {
+        "id": "developer",
+        "name": "Developer Agent",
+        "model": "vertexai-proxy/google/gemini-2.5-flash-high",
+        "tools": {
+          "allow": ["coding-agent", "ralph", "exec", "read", "write", "edit"]
+        },
+        "workspace": "~/.openclaw/workspace-developer",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "rw",
+          "docker": {
+            "memory": "4g",
+            "memorySwap": "8g"
+          }
+        }
+      },
+      {
+        "id": "researcher",
+        "name": "Researcher Agent",
+        "model": "vertexai-proxy/google/gemini-2.5-flash-medium",
+        "tools": {
+          "allow": ["gemini", "gemini-grounded-research", "exec", "read", "write"]
+        },
+        "workspace": "~/.openclaw/workspace-researcher",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "ro"
+        }
+      },
+      {
+        "id": "qa-reviewer",
+        "name": "QA-Reviewer Agent",
+        "model": "vertexai-proxy/google/gemini-2.5-flash-high",
+        "tools": {
+          "allow": ["coding-agent", "exec", "read", "write", "edit"]
+        },
+        "workspace": "~/.openclaw/workspace-qa-reviewer",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "rw"
+        }
+      },
+      {
+        "id": "image-generator",
+        "name": "Image Generator Agent",
+        "model": "vertexai-proxy/google/gemini-2.5-flash-medium",
+        "tools": {
+          "allow": ["gemini", "nano-banana-pro", "exec", "write"]
+        },
+        "workspace": "~/.openclaw/workspace-image-generator",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "rw"
+        }
+      },
+      {
+        "id": "devops",
+        "name": "DevOps Agent",
+        "model": "vertexai-proxy/google/gemini-2.5-flash-medium",
+        "tools": {
+          "allow": ["github", "exec", "read", "write"]
+        },
+        "workspace": "~/.openclaw/workspace-devops",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent",
+          "workspaceAccess": "rw"
+        }
+      }
+    ]
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto"
+  },
+  "channels": {
+    "slack": {
+      "mode": "socket",
+      "webhookPath": "/slack/events",
+      "userTokenReadOnly": true,
+      "groupPolicy": "open"
+    }
+  },
+  "gateway": {
+    "mode": "local"
+  },
+  "plugins": {
+    "entries": {
+      "google-gemini-cli-auth": {
+        "enabled": true
+      },
+      "slack": {
+        "enabled": true
+      }
+    }
+  },
+  "memory": {
+    "backend": "qmd",
+    "qmd": {
+      "includeDefaultMemory": true,
+      "sessions": {
+        "enabled": true,
+        "retentionDays": 30
+      },
+      "update": {
+        "interval": "5m",
+        "onBoot": true
+      },
+      "limits": {
+        "maxResults": 10,
+        "maxSnippetChars": 700,
+        "maxInjectedChars": 4000,
+        "timeoutMs": 5000
+      }
+    }
+  },
+  "tools": {
+    "agentToAgent": {
+      "enabled": true,
+      "allow": ["main", "planner", "developer", "researcher", "qa-reviewer", "devops", "image-generator"]
+    },
+    "sandbox": {
+      "tools": {
+        "allow": [
+          "exec",
+          "process",
+          "read",
+          "write",
+          "edit",
+          "apply_patch",
+          "sessions_list",
+          "sessions_history",
+          "sessions_send",
+          "sessions_spawn",
+          "session_status"
+        ],
+        "deny": [
+          "browser",
+          "canvas",
+          "nodes",
+          "cron",
+          "gateway",
+          "telegram",
+          "whatsapp",
+          "discord",
+          "googlechat",
+          "signal",
+          "imessage",
+          "slack"
+        ]
+      }
+    }
+  }
+}

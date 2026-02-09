@@ -1,0 +1,132 @@
+FROM openclaw-sandbox:bookworm-slim
+
+USER root
+
+# Install all development tools in a single layer for efficiency
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # ===== Core Utilities =====
+    curl \
+    wget \
+    jq \
+    git \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    # ===== Editors & Terminal Tools =====
+    vim \
+    nano \
+    tmux \
+    # ===== Compression & File Tools =====
+    unzip \
+    zip \
+    tar \
+    gzip \
+    bzip2 \
+    xz-utils \
+    rsync \
+    # ===== SSH & Network Tools =====
+    openssh-client \
+    netcat-openbsd \
+    # ===== Build Tools =====
+    build-essential \
+    cmake \
+    pkg-config \
+    # ===== Python 3.11 =====
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-dev \
+    # ===== Ruby 3.1 =====
+    ruby-full \
+    # ===== PHP 8.2 =====
+    php \
+    php-cli \
+    php-mbstring \
+    php-xml \
+    php-curl \
+    php-zip \
+    # ===== Database Clients =====
+    sqlite3 \
+    postgresql-client \
+    default-mysql-client \
+    redis-tools \
+    # ===== Other Useful Tools =====
+    procps \
+    htop \
+    tree \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20.x LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Go 1.21+
+RUN ARCH="$(dpkg --print-architecture)" \
+    && if [ "$ARCH" = "arm64" ]; then GO_ARCH="arm64"; else GO_ARCH="amd64"; fi \
+    && wget -O go.tar.gz "https://go.dev/dl/go1.22.0.linux-${GO_ARCH}.tar.gz" \
+    && tar -C /usr/local -xzf go.tar.gz \
+    && rm go.tar.gz
+
+# Install Rust (via rustup) system-wide
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --no-modify-path \
+    && chmod -R a+w /usr/local/rustup /usr/local/cargo
+
+# Install GitHub CLI
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y gh \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install additional package managers (as root, then we'll switch to user)
+# Poetry (Python) - install via pip for proper global access
+RUN pip3 install --break-system-packages poetry
+
+# Composer (PHP)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Yarn & pnpm (Node.js)
+RUN npm install -g yarn pnpm
+
+# PATH already includes Rust (/usr/local/cargo/bin) and Go
+ENV PATH="/usr/local/go/bin:/usr/local/cargo/bin:${PATH}"
+
+# Verify all installations
+RUN echo "=== Verifying Installations ===" \
+    && python3 --version \
+    && pip3 --version \
+    && poetry --version \
+    && node --version \
+    && npm --version \
+    && yarn --version \
+    && pnpm --version \
+    && ruby --version \
+    && gem --version \
+    && php --version \
+    && composer --version \
+    && go version \
+    && rustc --version \
+    && cargo --version \
+    && git --version \
+    && gh --version \
+    && sqlite3 --version \
+    && psql --version \
+    && mysql --version \
+    && redis-cli --version \
+    && echo "=== All tools installed successfully! ==="
+
+# Switch to non-root user (UID will be set at runtime via docker user flag)
+USER 1000
+
+# Set cache directories to /tmp (since root is read-only)
+ENV POETRY_CACHE_DIR=/tmp/poetry-cache \
+    POETRY_VIRTUALENVS_IN_PROJECT=false \
+    POETRY_VIRTUALENVS_PATH=/tmp/poetry-virtualenvs \
+    GOCACHE=/tmp/go-cache \
+    GOPATH=/tmp/go

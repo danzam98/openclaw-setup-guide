@@ -1,0 +1,90 @@
+# HEARTBEAT.md - {{AGENT_NAME}}'s Proactive Task List
+
+**Purpose:** Guide {{AGENT_NAME}}'s periodic checks to ensure proactive project management.
+
+---
+
+## 🔍 Every Heartbeat (~30 min)
+
+### Context Review
+- Review last 15-20 messages for:
+  - ✅ Unfinished commitments
+  - ✅ Questions that need follow-up
+  - ✅ Deadlines or time-sensitive items
+  - ✅ Action items from discussions
+
+### Agent Communication Check
+- Check status of active sub-agents (planner, developer, researcher, qa-reviewer, devops)
+- Review any completed sub-agent tasks since last heartbeat
+- Surface any blocked or failed sub-agent work
+
+### Task Progress
+- Review active tasks
+- Check for stale tasks (>48 hours without update)
+- Identify tasks approaching deadlines
+
+---
+
+## 🔄 Rotate Through (2-4x per day)
+
+Track in `memory/heartbeat-state.json` when each was last checked:
+
+### Project Health Checks
+- Review progress on active initiatives
+- Check for any blocking issues
+- Monitor resource usage
+
+### Memory Maintenance
+- **Every 72 hours OR when >50 messages since last review** (whichever comes first)
+- Review recent `memory/YYYY-MM-DD.md` files
+- Update `MEMORY.md` with distilled learnings
+- Clean up outdated information
+
+### Proactive Improvements
+- Suggest optimizations or improvements based on recent patterns
+- Identify recurring issues that could be automated
+- Propose new tasks or projects based on discussions
+
+---
+
+## 📋 Active To-Do Lists
+
+**User's Tasks** (from messages - track completion):
+- ({{AGENT_NAME}} will populate from messages)
+
+**{{AGENT_NAME}}'s Tasks** (self-assigned proactive work):
+- ({{AGENT_NAME}} will add tasks here as needed)
+
+---
+
+## ⏰ Time-Based Checks
+
+### Quiet Hours ({{QUIET_HOURS_START}}-{{QUIET_HOURS_END}} {{USER_TIMEZONE}})
+- Only report urgent items (errors, critical failures, explicit questions)
+- Continue background work (memory maintenance, log monitoring)
+- Save non-urgent updates for active hours
+
+### Peak Hours ({{ACTIVE_HOURS_START}}-{{ACTIVE_HOURS_END}} {{USER_TIMEZONE}})
+- Full proactive engagement
+- Report on findings, suggest improvements
+- Ask clarifying questions as needed
+
+---
+
+## 🎯 Success Criteria
+
+**Good heartbeat:**
+- Actionable information provided
+- Progress on commitments tracked
+- Proactive value added
+
+**Skip (HEARTBEAT_OK) when:**
+- No new information since last check
+- All tasks on track
+- No urgent items
+- During quiet hours (unless urgent)
+
+---
+
+**Last Updated:** {{CURRENT_DATE}}
+**Maintained by:** {{AGENT_NAME}} (with user guidance)
