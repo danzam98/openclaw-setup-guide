@@ -66,6 +66,8 @@ OpenClaw is a multi-agent orchestration system that enables AI agents to work to
 - **Docker Sandbox**: Provides isolated, secure execution environment for agent operations
 - **Slack Integration**: Enables asynchronous notifications and control via Slack workspace
 
+> **📚 For detailed agent architecture**, including how agents delegate to external CLIs (Claude Code, Cursor) and the multi-tier model selection strategy, see [docs/AGENT_ARCHITECTURE.md](docs/AGENT_ARCHITECTURE.md).
+
 ## Prerequisites
 
 Before starting, ensure you have:
